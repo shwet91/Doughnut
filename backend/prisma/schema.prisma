@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -13,7 +7,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model User {
   id Int @id @default(autoincrement())
@@ -31,8 +24,12 @@ model User {
 
   sentRequests FriendRequest[] @relation("SentRequests")
   receivedRequests FriendRequest[] @relation("ReceiverRequests")
-}
 
+  joinedRooms Room[] @relation("Rooms")
+
+  sentMesssages Message[] @relation("sender")
+
+}
 model FriendRequest {
   id Int @id @default(autoincrement())
 
@@ -42,4 +39,35 @@ model FriendRequest {
    sender User @relation("SentRequests" , fields: [owner], references: [id])
     receiver User @relation("ReceiverRequests" , fields: [friend], references: [id])
 
+}
+
+
+model Room {
+id Int @id @default(autoincrement())
+
+type String
+members User[] @relation("Rooms")
+name String
+
+messages Message[] @relation("bon")
+
+createdAt DateTime @default(now()) @db.Timestamp(6)
+}
+
+
+model Message {
+  id Int @id @default(autoincrement())
+
+  content String
+
+  
+
+  senderId Int
+  owner User @relation("sender" , fields: [senderId] , references: [id])
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  read Boolean
+
+  roomId Int
+
+  room Room @relation("bon" , fields: [roomId] , references: [id])
 }

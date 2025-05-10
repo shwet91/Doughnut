@@ -10,6 +10,7 @@ import { Avatar } from "@radix-ui/react-avatar";
 import { User } from "@/types";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 function AddFriend() {
   const [open, setOpen] = useState(true);
@@ -17,6 +18,8 @@ function AddFriend() {
   const [loader, setLoader] = useState(false);
   const [result, setResult] = useState<User[]>([]);
   const [reqBtn, setReqBtn] = useState(true);
+
+  const session = useSession()
 
   useEffect(() => {
     if (result.length === 1) {
@@ -33,7 +36,7 @@ function AddFriend() {
 
     if (result.length === 1) {
       const senRequest = await axios.post(apiEndPoints.createFriendRequest, {
-        userId: 1,
+        userId: session.data?.user._id ,
         friendUsername: result[0].username,
       });
 

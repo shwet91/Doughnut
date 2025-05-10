@@ -19,7 +19,6 @@ function Notification() {
     const fetch = async () => {
       if (loading === true) return;
       setLoading(true);
-      console.log("this is master test", session, session.data?.user._id);
       console.log("Fetch started");
       const response = await axios.get(
         `${apiEndPoints.getFriendRequest}/${session.data?.user._id}`

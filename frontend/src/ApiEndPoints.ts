@@ -7,6 +7,7 @@ const apiEndPoints = {
   createFriendRequest: `${server}/user/createFriendRequest`, // POST , ssend  userId , friendUsername in body
   getUser: `${server}/user/user`, // GET , send username as params
   getFriendRequest : `${server}/user/getFriendRequest`, // GET , send user Id of user who want to check requests he has reiceved by others.
-};
+  removeFriend : `${server}/user/removeFriend`, // POST , send userId and friendId in body
+   };
 
 export default apiEndPoints;

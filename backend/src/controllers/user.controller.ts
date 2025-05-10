@@ -115,6 +115,8 @@ const createFriendRequest = asyncHandler(async (req, res) => {
     throw new ApiError(400, "No such friend suer found");
   }
 
+  console.log("this is test :" , friend.id , user.id)
+
   if (friend.id === user.id) {
     throw new ApiError(400, "user can not send request to itself");
   }
@@ -230,6 +232,70 @@ const getFriendRequest = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, senders, "Friend Request fretch successful"));
 });
 
+const removeFriend = asyncHandler(async(req , res) => {
+  const { userId , friendId } = req.body;
+
+  console.log(req.body)
+
+  if( !userId || !friendId) {
+    throw new ApiError(400 , "please provide user or friend Id")
+  }
+
+  const user = await prisma.user.findUnique({
+    where : {
+      id : Number(userId)
+    },
+    include : {
+      friends : true
+    }
+  })
+
+  if(!user){
+    throw new ApiError(400 , "No user found")
+  }
+
+  const friend = await prisma.user.findUnique({
+    where : {
+      id : Number(friendId)
+    }
+  })
+
+  if(!friend){
+    throw new ApiError(400 , "No Friend as user foind")
+  }
+
+  const isFriend = user.friends.some(f => f.id === friend.id )
+
+  if( !isFriend ){
+    throw new ApiError(400 , "This user is not your friend")
+  }
+
+  const updatedUser = await prisma.user.update({
+    where : {
+      id : user.id
+    },
+    data : {
+      friends : {
+        disconnect : { id : friend.id }
+      }
+    }
+  })
+
+  const updatedFriend = await prisma.user.update({
+    where : {
+      id : friend.id
+    },
+    data : {
+      friends : {
+        disconnect : { id : user.id }
+      }
+    }
+  })
+
+  return res.status(200).json(new ApiResponse(200 , updatedUser , "Friend removed from the list."))
+
+})
+
 export {
   addFriend,
   getFriends,
@@ -237,4 +303,5 @@ export {
   getUser,
   searchUser,
   getFriendRequest,
+  removeFriend
 };
